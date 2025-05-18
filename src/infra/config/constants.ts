@@ -1,0 +1,27 @@
+export const APP_CONSTANTS = {
+  APP_NAME: 'DailyMed API',
+  APP_VERSION: '1.0.0',
+  DEFAULT_PAGE_SIZE: 20,
+  MAX_PAGE_SIZE: 100,
+  DEFAULT_SORT_FIELD: 'createdAt',
+  DEFAULT_SORT_ORDER: 'desc',
+} as const;
+
+export const CACHE_CONSTANTS = {
+  DEFAULT_TTL: 3600,
+  PREFIX: 'dailymed:',
+} as const;
+
+export const AUTH_CONSTANTS = {
+  JWT_ALGORITHM: 'HS256',
+  TOKEN_EXPIRES_IN: '1d',
+  REFRESH_TOKEN_EXPIRES_IN: '7d',
+} as const;
+
+export const VALIDATION_CONSTANTS = {
+  PASSWORD_MIN_LENGTH: 8,
+  PASSWORD_MAX_LENGTH: 100,
+  NAME_MIN_LENGTH: 2,
+  NAME_MAX_LENGTH: 100,
+  EMAIL_MAX_LENGTH: 255,
+} as const;
