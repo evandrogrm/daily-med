@@ -9,24 +9,20 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
-      - "9229:9229"
     environment:
       - NODE_ENV=development
       - PORT=3000
       - MONGODB_URI=mongodb://mongo:27017/dailymed
       - JWT_SECRET=your_jwt_secret_here
-      - DEBUG=app:*
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     volumes:
       - .:/app
       - /app/node_modules
-      - /app/dist
     depends_on:
       - mongo
     networks:
       - dailymed-network
     command: yarn dev
-    stdin_open: true
-    tty: true
 
   mongo:
     image: mongo:6.0

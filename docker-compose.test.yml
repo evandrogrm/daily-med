@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      - NODE_ENV=test
+      - MONGODB_URI=mongodb://mongo:27017/dailymed-test
+    depends_on:
+      - mongo
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: sh -c "yarn test:integration"
+
+  mongo:
+    image: mongo:6.0
+    environment:
+      - MONGO_INITDB_DATABASE=dailymed-test
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data_test:/data/db
+
+volumes:
+  mongodb_data_test:
