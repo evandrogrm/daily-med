@@ -36,7 +36,6 @@ export class MedicationService implements IMedicationService {
   }
 
   async extractAndMapIndications(text: string): Promise<{ description: string, icd10Code: string, icd10Description: string, confidence: number }[]> {
-    // Use the ICD-10 mapper to find relevant codes
     const { mapTextToICD10 } = await import('@core/application/utils/icd10-mapper');
     return mapTextToICD10(text);
   }

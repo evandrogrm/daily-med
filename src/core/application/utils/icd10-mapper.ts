@@ -4,7 +4,6 @@ interface ICD10Mapping {
   keywords: string[];
 }
 
-// A simplified mapping of common conditions to ICD-10 codes
 const ICD10_MAPPINGS: ICD10Mapping[] = [
   {
     code: 'E78.5',
@@ -33,11 +32,6 @@ const ICD10_MAPPINGS: ICD10Mapping[] = [
   }
 ];
 
-/**
- * Finds the best matching ICD-10 code for a given text
- * @param text The text to analyze
- * @returns Array of matched ICD-10 codes with confidence scores
- */
 export function mapTextToICD10(text: string): Array<{
   description: string;
   icd10Code: string;
@@ -52,16 +46,13 @@ export function mapTextToICD10(text: string): Array<{
     confidence: number;
   }> = [];
 
-  // Simple keyword matching approach
   for (const mapping of ICD10_MAPPINGS) {
     for (const keyword of mapping.keywords) {
       if (lowerText.includes(keyword.toLowerCase())) {
-        // Calculate a simple confidence score based on keyword match
-        const keywordWeight = 0.7; // Base confidence for keyword match
-        const lengthFactor = Math.min(keyword.length / 10, 1); // Longer keywords are more specific
-        const confidence = Math.min(keywordWeight + (lengthFactor * 0.3), 0.95); // Cap at 95%
+        const keywordWeight = 0.7;
+        const lengthFactor = Math.min(keyword.length / 10, 1);
+        const confidence = Math.min(keywordWeight + (lengthFactor * 0.3), 0.95);
         
-        // Add to results if not already added with higher confidence
         const existingIndex = results.findIndex(r => r.icd10Code === mapping.code);
         if (existingIndex === -1 || results[existingIndex].confidence < confidence) {
           const result = {
@@ -81,10 +72,8 @@ export function mapTextToICD10(text: string): Array<{
     }
   }
 
-  // Sort by confidence (highest first)
   results.sort((a, b) => b.confidence - a.confidence);
 
-  // If no matches found, return a default
   if (results.length === 0) {
     return [{
       description: text.substring(0, 50) + (text.length > 50 ? '...' : ''),
