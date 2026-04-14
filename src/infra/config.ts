@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { cleanEnv, num, str, ValidatorSpec } from 'envalid';
+import { cleanEnv, num, str } from 'envalid';
 
 dotenv.config();
 
