@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { cleanEnv, num, str } from 'envalid';
+import { cleanEnv, num, str, ValidatorSpec } from 'envalid';
 
 dotenv.config();
 
@@ -13,8 +13,7 @@ const env = cleanEnv(process.env, {
     default: 'mongodb://localhost:27017/dailymed',
   }),
   JWT_SECRET: str({
-    default: 'your_jwt_secret_here',
-    desc: 'Secret key for JWT token generation',
+    desc: 'Secret key for JWT token generation — must be set explicitly',
   }),
   JWT_EXPIRES_IN: str({
     default: '1d',
@@ -31,6 +30,10 @@ const env = cleanEnv(process.env, {
     default: '',
     desc: 'API key for OpenAI (for LLM features)',
   }),
+  CORS_ORIGIN: str({
+    default: 'http://localhost:3000',
+    desc: 'Comma-separated list of allowed CORS origins',
+  }),
 });
 
 const config = {
@@ -44,6 +47,7 @@ const config = {
   logLevel: env.LOG_LEVEL,
   dailymedApiUrl: env.DAILYMED_API_URL,
   openaiApiKey: env.OPENAI_API_KEY,
+  corsOrigin: env.CORS_ORIGIN,
   isDevelopment: env.NODE_ENV === 'development',
   isTest: env.NODE_ENV === 'test',
   isProduction: env.NODE_ENV === 'production',

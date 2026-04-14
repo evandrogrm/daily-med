@@ -51,12 +51,17 @@ export class MedicationRepository implements IMedicationRepository {
     return !!result;
   }
 
+  private escapeRegex(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
   async search(query: string): Promise<MedicationEntity[]> {
+    const sanitizedQuery = this.escapeRegex(query);
     const medications = await MedicationModel.find({
       $or: [
-        { name: { $regex: query, $options: 'i' } },
-        { description: { $regex: query, $options: 'i' } },
-        { 'indications.description': { $regex: query, $options: 'i' } },
+        { name: { $regex: sanitizedQuery, $options: 'i' } },
+        { description: { $regex: sanitizedQuery, $options: 'i' } },
+        { 'indications.description': { $regex: sanitizedQuery, $options: 'i' } },
       ],
     }).exec();
     return medications.map(this.toDomain.bind(this));
