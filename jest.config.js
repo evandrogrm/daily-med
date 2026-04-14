@@ -8,6 +8,10 @@ module.exports = {
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^@application/(.*)$': '<rootDir>/src/application/$1',
+    '^@core/(.*)$': '<rootDir>/src/core/$1',
+    '^@infrastructure/(.*)$': '<rootDir>/src/infrastructure/$1',
+    '^@tests/(.*)$': '<rootDir>/src/tests/$1',
   },
   collectCoverageFrom: [
     'src/**/*.ts',
