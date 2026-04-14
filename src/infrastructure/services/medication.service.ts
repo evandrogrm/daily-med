@@ -1,9 +1,10 @@
 import { inject, injectable } from 'tsyringe';
-import { Medication } from '../../../core/domain/entities/medication.entity';
-import { IMedicationRepository } from '../../../core/domain/interfaces/repositories/medication.repository.interface';
-import { IMedicationService } from '../../../core/domain/interfaces/services/medication.service.interface';
+import { Medication } from '../../core/domain/entities/medication.entity';
+import { IMedicationRepository } from '../../core/domain/interfaces/repositories/medication.repository.interface';
+import { IMedicationService } from '../../core/domain/interfaces/services/medication.service.interface';
 import { CreateMedicationDto } from '../../application/dtos/create-medication.dto';
 import { UpdateMedicationDto } from '../../application/dtos/update-medication.dto';
+import { config } from '../../infra/config';
 
 @injectable()
 export class MedicationService implements IMedicationService {
@@ -36,6 +37,11 @@ export class MedicationService implements IMedicationService {
   }
 
   async extractAndMapIndications(text: string): Promise<{ description: string, icd10Code: string, icd10Description: string, confidence: number }[]> {
+    if (config.openaiApiKey) {
+      const { extractIndicationsWithOpenAI } = await import('@core/application/utils/openai-indication-extractor');
+      return extractIndicationsWithOpenAI(text);
+    }
+
     const { mapTextToICD10 } = await import('@core/application/utils/icd10-mapper');
     return mapTextToICD10(text);
   }
