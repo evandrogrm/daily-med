@@ -13,8 +13,8 @@ const env = cleanEnv(process.env, {
     default: 'mongodb://localhost:27017/dailymed',
   }),
   JWT_SECRET: str({
-    default: 'your_jwt_secret_here',
     desc: 'Secret key for JWT token generation',
+    ...(process.env.NODE_ENV === 'test' ? { default: 'test-secret-do-not-use-in-production' } : {}),
   }),
   JWT_EXPIRES_IN: str({
     default: '1d',

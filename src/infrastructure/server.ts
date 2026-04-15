@@ -1,5 +1,7 @@
 import cors from 'cors';
 import express from 'express';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 import { connect } from './config/database';
@@ -25,8 +27,29 @@ class Server {
   }
 
   private configureMiddlewares() {
-    this.app.use(cors());
-    this.app.use(express.json());
+    this.app.use(helmet());
+
+    const allowedOrigins = process.env.CORS_ORIGIN
+      ? process.env.CORS_ORIGIN.split(',')
+      : [];
+    this.app.use(
+      cors({
+        origin: allowedOrigins.length > 0 ? allowedOrigins : false,
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+      }),
+    );
+
+    this.app.use(express.json({ limit: '1mb' }));
+
+    const limiter = rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 100,
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: { status: 'error', message: 'Too many requests, please try again later.' },
+    });
+    this.app.use(limiter);
   }
 
   private configureRoutes() {

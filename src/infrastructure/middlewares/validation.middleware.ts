@@ -26,8 +26,9 @@ export const errorHandler = (
   _next: NextFunction
 ) => {
   console.error('Error:', err);
+  const isDev = process.env.NODE_ENV === 'development';
   res.status(500).json({
     message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined,
+    ...(isDev ? { error: err.message } : {}),
   });
 };
