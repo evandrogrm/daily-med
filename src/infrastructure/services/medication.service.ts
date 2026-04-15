@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
-import { Medication } from '../../../core/domain/entities/medication.entity';
-import { IMedicationRepository } from '../../../core/domain/interfaces/repositories/medication.repository.interface';
-import { IMedicationService } from '../../../core/domain/interfaces/services/medication.service.interface';
+import { Medication } from '../../core/domain/entities/medication.entity';
+import { IMedicationRepository } from '../../core/domain/interfaces/repositories/medication.repository.interface';
+import { IMedicationService } from '../../core/domain/interfaces/services/medication.service.interface';
 import { CreateMedicationDto } from '../../application/dtos/create-medication.dto';
 import { UpdateMedicationDto } from '../../application/dtos/update-medication.dto';
 
