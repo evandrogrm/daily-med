@@ -1,5 +1,7 @@
 import cors from 'cors';
 import express, { Application } from 'express';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import 'reflect-metadata';
 import { config } from './config';
 import { mongoDBConnection } from './database/mongodb';
@@ -29,8 +31,29 @@ class App {
   }
 
   private middlewares(): void {
-    this.express.use(cors());
-    this.express.use(express.json());
+    this.express.use(helmet());
+
+    const allowedOrigins = process.env.CORS_ORIGIN
+      ? process.env.CORS_ORIGIN.split(',')
+      : [];
+    this.express.use(
+      cors({
+        origin: allowedOrigins.length > 0 ? allowedOrigins : false,
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+      }),
+    );
+
+    this.express.use(express.json({ limit: '1mb' }));
+
+    const limiter = rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 100,
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: { status: 'error', message: 'Too many requests, please try again later.' },
+    });
+    this.express.use(limiter);
   }
 
   private routes(): void {

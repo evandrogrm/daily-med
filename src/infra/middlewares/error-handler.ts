@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { AppError } from '../../core/errors/app-error';
+import { config } from '../config';
 import { ApiResponse } from '../http/response';
 import { logger } from '../logger';
 
@@ -14,7 +15,7 @@ export const errorHandler = (
       code: err.code,
       statusCode: err.statusCode,
       details: err.details,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+      stack: config.isDevelopment ? err.stack : undefined,
     });
 
     return ApiResponse.error(
@@ -22,7 +23,7 @@ export const errorHandler = (
       err.message,
       err.statusCode,
       err.code,
-      process.env.NODE_ENV === 'development' ? err.details : undefined
+      config.isDevelopment ? err.details : undefined
     );
   }
 
@@ -37,6 +38,6 @@ export const errorHandler = (
     'Internal server error',
     500,
     'INTERNAL_SERVER_ERROR',
-    process.env.NODE_ENV === 'development' ? { message: err.message, stack: err.stack } : undefined
+    config.isDevelopment ? { message: err.message, stack: err.stack } : undefined
   );
 };

@@ -4,6 +4,10 @@ import { IMedicationRepository } from '../../../../core/domain/interfaces/reposi
 import { Medication as MedicationEntity } from '../../../../core/domain/entities/medication.entity';
 import { Medication as MedicationModel, IMedicationDocument } from './models/medication.model';
 
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 @injectable()
 export class MedicationRepository implements IMedicationRepository {
   private toDomain(medication: IMedicationDocument): MedicationEntity {
@@ -52,11 +56,12 @@ export class MedicationRepository implements IMedicationRepository {
   }
 
   async search(query: string): Promise<MedicationEntity[]> {
+    const sanitized = escapeRegex(query);
     const medications = await MedicationModel.find({
       $or: [
-        { name: { $regex: query, $options: 'i' } },
-        { description: { $regex: query, $options: 'i' } },
-        { 'indications.description': { $regex: query, $options: 'i' } },
+        { name: { $regex: sanitized, $options: 'i' } },
+        { description: { $regex: sanitized, $options: 'i' } },
+        { 'indications.description': { $regex: sanitized, $options: 'i' } },
       ],
     }).exec();
     return medications.map(this.toDomain.bind(this));
