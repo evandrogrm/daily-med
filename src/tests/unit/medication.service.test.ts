@@ -1,6 +1,7 @@
 import { Medication } from '@core/domain/entities/medication.entity';
 import { MedicationService } from '@infrastructure/services/medication.service';
 import { IMedicationRepository } from '@core/domain/interfaces/repositories/medication.repository.interface';
+import { CreateMedicationDto } from '@application/dtos/create-medication.dto';
 
 describe('MedicationService', () => {
   let service: MedicationService;
@@ -32,13 +33,13 @@ describe('MedicationService', () => {
 
   describe('createMedication', () => {
     it('should create a new medication', async () => {
-      const medicationData: IMedication = {
+      const medicationData: CreateMedicationDto = {
         name: 'Ibuprofen',
         dosage: '200mg',
         frequency: 'Every 6 hours',
       };
 
-      const expectedMedication: IMedication = {
+      const expectedMedication: Medication = {
         id: '1',
         ...medicationData,
         createdAt: new Date(),
@@ -57,6 +58,19 @@ describe('MedicationService', () => {
         updatedAt: expect.any(Date),
       }));
       expect(result).toEqual(expectedMedication);
+    });
+
+    it('should handle repository errors during create', async () => {
+      const medicationData: CreateMedicationDto = {
+        name: 'Ibuprofen',
+        dosage: '200mg',
+        frequency: 'Every 6 hours',
+      };
+      const error = new Error('Create failed');
+      mockRepository.create.mockRejectedValue(error);
+
+      await expect(service.createMedication(medicationData)).rejects.toThrow('Create failed');
+      expect(mockRepository.create).toHaveBeenCalledWith(medicationData);
     });
   });
 
