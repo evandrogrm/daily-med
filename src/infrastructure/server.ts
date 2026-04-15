@@ -1,10 +1,10 @@
 import cors from 'cors';
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 import { connect } from './config/database';
 import { MedicationController } from './controllers/medication.controller';
-import { errorHandler } from './middlewares/validation.middleware';
+import { AppError } from '../core/errors/app-error';
 
 class Server {
   public app: express.Application;
@@ -38,18 +38,45 @@ class Server {
     });
 
     router.post('/medications', ...medicationController.createMedication);
+    router.get('/medications/search', medicationController.searchMedications);
+    router.post('/medications/extract-indications', medicationController.extractIndications);
     router.get('/medications', medicationController.getAllMedications);
     router.get('/medications/:id', medicationController.getMedication);
     router.put('/medications/:id', ...medicationController.updateMedication);
     router.delete('/medications/:id', medicationController.deleteMedication);
-    router.get('/medications/search', medicationController.searchMedications);
-    router.post('/medications/extract-indications', medicationController.extractIndications);
 
     this.app.use('/api', router);
   }
 
   private configureErrorHandling() {
-    this.app.use(errorHandler);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    this.app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+      if (err instanceof AppError) {
+        return res.status(err.statusCode).json({
+          status: 'error',
+          message: err.message,
+          code: err.code,
+          ...(process.env.NODE_ENV === 'development' && err.details ? { details: err.details } : {}),
+        });
+      }
+
+      if (err instanceof SyntaxError && 'type' in err) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Invalid JSON in request body',
+          code: 'INVALID_JSON',
+        });
+      }
+
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      console.error('Unhandled error:', err);
+      res.status(500).json({
+        status: 'error',
+        message: 'Internal server error',
+        code: 'INTERNAL_SERVER_ERROR',
+        ...(process.env.NODE_ENV === 'development' ? { error: message } : {}),
+      });
+    });
   }
 
   public async start() {
